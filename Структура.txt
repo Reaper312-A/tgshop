@@ -1,0 +1,24 @@
+telegram_bot/
+├── bot.py
+├── config.py
+├── data/
+│   ├── __init__.py
+│   └── products.py
+├── database/
+│   ├── __init__.py
+│   ├── models.py
+│   └── database.py
+├── keyboards/
+│   ├── __init__.py
+│   ├── inline.py
+│   └── products.py
+├── handlers/
+│   ├── __init__.py
+│   ├── start.py
+│   ├── city_metro.py
+│   ├── main_menu.py
+│   └── products.py
+└── requirements.txt
+    # ========== СТИМУЛЯТОРЫ ==========
+
+

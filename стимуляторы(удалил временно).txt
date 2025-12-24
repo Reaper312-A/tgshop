@@ -1,0 +1,624 @@
+from dataclasses import dataclass
+from typing import List, Optional
+import os
+
+@dataclass
+class Product:
+    id: int
+    name: str
+    category: str
+    subcategory: str
+    price: float
+    currency: str
+    description: str
+    short_description: str
+    quantity: int
+    available: bool = True
+    
+    @property
+    def photo_path(self):
+        """Путь к фото товара"""
+        from config import PRODUCT_PHOTOS_DIR, DEFAULT_PRODUCT_PHOTO
+        # Формируем имя файла: категория_подкатегория_id.jpg
+        filename = f"{self.category}_{self.subcategory}_{self.id}.jpg"
+        path = os.path.join(PRODUCT_PHOTOS_DIR, filename)
+        return path if os.path.exists(path) else DEFAULT_PRODUCT_PHOTO
+    
+    @property
+    def category_photo_path(self):
+        """Путь к фото категории"""
+        from config import CATEGORY_PHOTOS, DEFAULT_CATEGORY_PHOTO
+        key = f"{self.category}_{self.subcategory}"
+        return CATEGORY_PHOTOS.get(key, DEFAULT_CATEGORY_PHOTO)
+
+# ========== МАРИХУАНА ==========
+
+# Товары для категории Марихуана -> Шишки (12 товаров)
+WEED_BUDS_PRODUCTS = [
+    Product(id=1, name="🍓 Клубничная мечта", category="weed", subcategory="buds", price=1500, currency="RUB",
+            short_description="Сладкий ягодный", quantity=10,
+            description="Сорт с насыщенным ягодным вкусом и длительным эффектом. Идеален для расслабления.\n\nВес: 1г\nТГК: 18%\nЭффект: Расслабляющий"),
+    
+    Product(id=2, name="🌌 Северное сияние", category="weed", subcategory="buds", price=1800, currency="RUB",
+            short_description="Мощный индика", quantity=8,
+            description="Классический индика-сорт с глубоким расслабляющим эффектом.\n\nВес: 1г\nТГК: 22%\nЭффект: Сильный релакс"),
+    
+    Product(id=3, name="🍋 Лимонный хазе", category="weed", subcategory="buds", price=1700, currency="RUB",
+            short_description="Цитрусовый сатива", quantity=12,
+            description="Энергичный сатива-сорт с ярким цитрусовым вкусом.\n\nВес: 1г\nТГК: 20%\nЭффект: Энергичный"),
+    
+    Product(id=4, name="💜 Фиолетовый куш", category="weed", subcategory="buds", price=2000, currency="RUB",
+            short_description="Экзотический сорт", quantity=6,
+            description="Редкий сорт с фиолетовыми соцветиями и сладким вкусом.\n\nВес: 1г\nТГК: 24%\nЭффект: Сбалансированный"),
+    
+    Product(id=5, name="🦍 Горилла глю", category="weed", subcategory="buds", price=2200, currency="RUB",
+            short_description="Мощный гибрид", quantity=5,
+            description="Один из самых мощных гибридов с высоким содержанием ТГК.\n\nВес: 1г\nТГК: 28%\nЭффект: Очень сильный"),
+    
+    Product(id=6, name="🍯 Медовые шишки", category="weed", subcategory="buds", price=1600, currency="RUB",
+            short_description="Сладкий медный вкус", quantity=15,
+            description="Нежный сорт со сладким медовым послевкусием.\n\nВес: 1г\nТГК: 16%\nЭффект: Легкий"),
+    
+    Product(id=7, name="🌲 Лесная ягода", category="weed", subcategory="buds", price=1900, currency="RUB",
+            short_description="Ягодно-хвойный букет", quantity=9,
+            description="Сорт с уникальным сочетанием ягодных и хвойных нот.\n\nВес: 1г\nТГК: 21%\nЭффект: Умеренный"),
+    
+    Product(id=8, name="🚀 Космический кекс", category="weed", subcategory="buds", price=2100, currency="RUB",
+            short_description="Пряный десертный", quantity=7,
+            description="Сорт с пряным десертным вкусом и космическим эффектом.\n\nВес: 1г\nТГК: 23%\nЭффект: Креативный"),
+    
+    Product(id=9, name="🫐 Черничный куш", category="weed", subcategory="buds", price=1750, currency="RUB",
+            short_description="Ягодный индика", quantity=11,
+            description="Индика-сорт с насыщенным черничным ароматом.\n\nВес: 1г\nТГК: 19%\nЭффект: Расслабляющий"),
+    
+    Product(id=10, name="☀️ Утреннее солнце", category="weed", subcategory="buds", price=1650, currency="RUB",
+            short_description="Энергичная сатива", quantity=14,
+            description="Идеальный утренний сорт для бодрости и энергии.\n\nВес: 1г\nТГК: 17%\nЭффект: Бодрящий"),
+    
+    Product(id=11, name="🌙 Лунный камень", category="weed", subcategory="buds", price=1950, currency="RUB",
+            short_description="Ночной релакс", quantity=8,
+            description="Сорт для вечернего отдыха и глубокого расслабления.\n\nВес: 1г\nТГК: 20%\nЭффект: Седативный"),
+    
+    Product(id=12, name="🏔 Альпийский снег", category="weed", subcategory="buds", price=1850, currency="RUB",
+            short_description="Чистый свежий вкус", quantity=13,
+            description="Чистый свежий сорт с освежающим послевкусием.\n\nВес: 1г\nТГК: 18%\nЭффект: Освежающий"),
+]
+
+# Товары для категории Марихуана -> Гашиш (12 товаров)
+WEED_HASH_PRODUCTS = [
+    Product(id=13, name="🔴 Красный ливан", category="weed", subcategory="hash", price=2500, currency="RUB",
+            short_description="Классический гашиш", quantity=8,
+            description="Традиционный гашиш с насыщенным вкусом и эффектом.\n\nВес: 1г\nТип: Твердый\nЭффект: Сильный"),
+    
+    Product(id=14, name="⚫ Марокканский золотой", category="weed", subcategory="hash", price=2800, currency="RUB",
+            short_description="Премиум гашиш", quantity=6,
+            description="Качественный марокканский гашиш с золотистым оттенком.\n\nВес: 1г\nТип: Мягкий\nЭффект: Сбалансированный"),
+    
+    Product(id=15, name="🌰 Ореховый бленд", category="weed", subcategory="hash", price=2300, currency="RUB",
+            short_description="Ореховый вкус", quantity=10,
+            description="Гашиш с ореховым послевкусием и мягким эффектом.\n\nВес: 1г\nТип: Полутвердый\nЭффект: Мягкий"),
+    
+    Product(id=16, name="🌿 Зеленый дракон", category="weed", subcategory="hash", price=2700, currency="RUB",
+            short_description="Травяной аромат", quantity=7,
+            description="Гашиш с выраженным травяным ароматом.\n\nВес: 1г\nТип: Мягкий\nЭффект: Средний"),
+    
+    Product(id=17, name="🍯 Медовый пласт", category="weed", subcategory="hash", price=2900, currency="RUB",
+            short_description="Сладкий медный", quantity=5,
+            description="Гашиш со сладким медовым послевкусием.\n\nВес: 1г\nТип: Мягкий\nЭффект: Глубокий"),
+    
+    Product(id=18, name="⚪ Белый афганец", category="weed", subcategory="hash", price=3100, currency="RUB",
+            short_description="Афганское качество", quantity=4,
+            description="Качественный афганский гашиш светлого оттенка.\n\nВес: 1г\nТип: Твердый\nЭффект: Мощный"),
+    
+    Product(id=19, name="🟤 Карамельный блок", category="weed", subcategory="hash", price=2400, currency="RUB",
+            short_description="Карамельный вкус", quantity=9,
+            description="Гашиш с карамельным вкусом и ровным эффектом.\n\nВес: 1г\nТип: Полутвердый\nЭффект: Сбалансированный"),
+    
+    Product(id=20, name="🔵 Голубой Непал", category="weed", subcategory="hash", price=3000, currency="RUB",
+            short_description="Непальский оригинал", quantity=6,
+            description="Традиционный непальский гашиш.\n\nВес: 1г\nТип: Твердый\nЭффект: Длительный"),
+    
+    Product(id=21, name="🟡 Золотой пласт", category="weed", subcategory="hash", price=2600, currency="RUB",
+            short_description="Золотистый оттенок", quantity=8,
+            description="Гашиш с золотистым оттенком и чистым эффектом.\n\nВес: 1г\nТип: Мягкий\nЭффект: Чистый"),
+    
+    Product(id=22, name="🟢 Изумрудный", category="weed", subcategory="hash", price=2750, currency="RUB",
+            short_description="Изумрудный цвет", quantity=7,
+            description="Гашиш с изумрудным оттенком.\n\nВес: 1г\nТип: Полутвердый\nЭффект: Яркий"),
+    
+    Product(id=23, name="🟣 Фиолетовый кристалл", category="weed", subcategory="hash", price=3200, currency="RUB",
+            short_description="Кристаллический", quantity=5,
+            description="Гашиш с кристаллической структурой.\n\nВес: 1г\nТип: Твердый\nЭффект: Интенсивный"),
+    
+    Product(id=24, name="⚫ Черный алмаз", category="weed", subcategory="hash", price=3400, currency="RUB",
+            short_description="Черный алмаз", quantity=4,
+            description="Элитный гашиш черного цвета.\n\nВес: 1г\nТип: Очень твердый\nЭффект: Очень сильный"),
+]
+
+# Товары для категории Марихуана -> План (12 товаров)
+WEED_PLAN_PRODUCTS = [
+    Product(id=25, name="🌿 Мексиканский план", category="weed", subcategory="plan", price=1200, currency="RUB",
+            short_description="Мексиканский сорт", quantity=15,
+            description="Классический мексиканский план.\n\nВес: 1г\nТип: Прессованный\nЭффект: Стандартный"),
+    
+    Product(id=26, name="🍂 Колумбийская трава", category="weed", subcategory="plan", price=1300, currency="RUB",
+            short_description="Колумбийское качество", quantity=12,
+            description="Качественный колумбийский план.\n\nВес: 1г\nТип: Прессованный\nЭффект: Яркий"),
+    
+    Product(id=27, name="🌱 Парагвайский пресс", category="weed", subcategory="plan", price=1100, currency="RUB",
+            short_description="Парагвайский", quantity=18,
+            description="Парагвайский прессованный план.\n\nВес: 1г\nТип: Прессованный\nЭффект: Легкий"),
+    
+    Product(id=28, name="🍃 Бразильский микс", category="weed", subcategory="plan", price=1400, currency="RUB",
+            short_description="Бразильский микс", quantity=10,
+            description="Бразильский план с миксом сортов.\n\nВес: 1г\nТип: Прессованный\nЭффект: Сбалансированный"),
+    
+    Product(id=29, name="🌾 Золотой пресс", category="weed", subcategory="plan", price=1500, currency="RUB",
+            short_description="Золотой пресс", quantity=8,
+            description="Качественный прессованный план.\n\nВес: 1г\nТип: Прессованный\nЭффект: Хороший"),
+    
+    Product(id=30, name="🥦 Свежий план", category="weed", subcategory="plan", price=1350, currency="RUB",
+            short_description="Свежий", quantity=14,
+            description="Свежий прессованный план.\n\nВес: 1г\nТип: Прессованный\nЭффект: Свежий"),
+    
+    Product(id=31, name="🍁 Осенний сбор", category="weed", subcategory="plan", price=1250, currency="RUB",
+            short_description="Осенний сбор", quantity=16,
+            description="План из осеннего сбора.\n\nВес: 1г\nТип: Прессованный\nЭффект: Теплый"),
+    
+    Product(id=32, name="🌼 Цветочный пресс", category="weed", subcategory="plan", price=1450, currency="RUB",
+            short_description="Цветочный", quantity=9,
+            description="План с цветочными нотами.\n\nВес: 1г\nТип: Прессованный\nЭффект: Нежный"),
+    
+    Product(id=33, name="🌴 Тропический", category="weed", subcategory="plan", price=1550, currency="RUB",
+            short_description="Тропический", quantity=7,
+            description="Тропический сорт плана.\n\nВес: 1г\nТип: Прессованный\nЭффект: Экзотический"),
+    
+    Product(id=34, name="🌵 Кактусовый микс", category="weed", subcategory="plan", price=1600, currency="RUB",
+            short_description="Кактусовый", quantity=6,
+            description="План с кактусовыми нотами.\n\nВес: 1г\nТип: Прессованный\nЭффект: Необычный"),
+    
+    Product(id=35, name="🎋 Бамбуковый пресс", category="weed", subcategory="plan", price=1400, currency="RUB",
+            short_description="Бамбуковый", quantity=11,
+            description="План с бамбуковыми нотами.\n\nВес: 1г\nТип: Прессованный\nЭффект: Свежий"),
+    
+    Product(id=36, name="🍀 Четырехлистный", category="weed", subcategory="plan", price=1700, currency="RUB",
+            short_description="Четырехлистный", quantity=5,
+            description="Редкий сорт плана.\n\nВес: 1г\nТип: Прессованный\nЭффект: Удачный"),
+]
+
+# Товары для категории Марихуана -> Масло/Концентраты (12 товаров)
+WEED_OIL_PRODUCTS = [
+    Product(id=37, name="💧 CO2 экстракт", category="weed", subcategory="oil", price=3500, currency="RUB",
+            short_description="CO2 экстракт", quantity=6,
+            description="Качественный CO2 экстракт.\n\nВес: 0.5г\nТип: Масло\nТГК: 85%"),
+    
+    Product(id=38, name="🫧 BHO концентрат", category="weed", subcategory="oil", price=3800, currency="RUB",
+            short_description="BHO концентрат", quantity=5,
+            description="BHO концентрат высокого качества.\n\nВес: 0.5г\nТип: Концентрат\nТГК: 88%"),
+    
+    Product(id=39, name="💎 Live resin", category="weed", subcategory="oil", price=4200, currency="RUB",
+            short_description="Live resin", quantity=4,
+            description="Live resin из свежезамороженных растений.\n\nВес: 0.5г\nТип: Концентрат\nТГК: 90%"),
+    
+    Product(id=40, name="✨ Rosin пресс", category="weed", subcategory="oil", price=4000, currency="RUB",
+            short_description="Rosin", quantity=5,
+            description="Rosin, полученный методом прессования.\n\nВес: 0.5г\nТип: Концентрат\nТГК: 86%"),
+    
+    Product(id=41, name="🛢️ Дистиллят", category="weed", subcategory="oil", price=3200, currency="RUB",
+            short_description="Дистиллят", quantity=8,
+            description="Чистый дистиллят без примесей.\n\nВес: 0.5г\nТип: Масло\nТГК: 92%"),
+    
+    Product(id=42, name="🌙 Ночное масло", category="weed", subcategory="oil", price=3700, currency="RUB",
+            short_description="Ночное", quantity=6,
+            description="Масло для вечернего использования.\n\nВес: 0.5г\nТип: Масло\nТГК: 84%"),
+    
+    Product(id=43, name="☀️ Дневной экстракт", category="weed", subcategory="oil", price=3600, currency="RUB",
+            short_description="Дневной", quantity=7,
+            description="Экстракт для дневного использования.\n\nВес: 0.5г\nТип: Масло\nТГК: 82%"),
+    
+    Product(id=44, name="🌈 Радужный концентрат", category="weed", subcategory="oil", price=4500, currency="RUB",
+            short_description="Радужный", quantity=3,
+            description="Разноцветный концентрат.\n\nВес: 0.5г\nТип: Концентрат\nТГК: 91%"),
+    
+    Product(id=45, name="🪐 Космическое масло", category="weed", subcategory="oil", price=4800, currency="RUB",
+            short_description="Космическое", quantity=2,
+            description="Мощное космическое масло.\n\nВес: 0.5г\nТип: Масло\nТГК: 94%"),
+    
+    Product(id=46, name="🔥 Огненный экстракт", category="weed", subcategory="oil", price=4100, currency="RUB",
+            short_description="Огненный", quantity=4,
+            description="Экстракт с огненным эффектом.\n\nВес: 0.5г\nТип: Экстракт\nТГК: 89%"),
+    
+    Product(id=47, name="❄️ Ледяной концентрат", category="weed", subcategory="oil", price=3900, currency="RUB",
+            short_description="Ледяной", quantity=5,
+            description="Концентрат с охлаждающим эффектом.\n\nВес: 0.5г\nТип: Концентрат\nТГК: 87%"),
+    
+    Product(id=48, name="🌊 Океанский дистиллят", category="weed", subcategory="oil", price=4300, currency="RUB",
+            short_description="Океанский", quantity=3,
+            description="Дистиллят с морскими нотами.\n\nВес: 0.5г\nТип: Дистиллят\nТГК: 93%"),
+]
+
+# Товары для категории Марихуана -> Ganjafood (12 товаров)
+WEED_FOOD_PRODUCTS = [
+    Product(id=49, name="🍪 Космическое печенье", category="weed", subcategory="food", price=800, currency="RUB",
+            short_description="Печенье", quantity=20,
+            description="Печенье с добавлением каннабиса.\n\nВес: 1 шт\nТГК: 25мг\nЭффект: Длительный"),
+    
+    Product(id=50, name="🍫 Шоколадный батончик", category="weed", subcategory="food", price=900, currency="RUB",
+            short_description="Шоколадный", quantity=18,
+            description="Шоколадный батончик с каннабисом.\n\nВес: 1 шт\nТГК: 30мг\nЭффект: Приятный"),
+    
+    Product(id=51, name="🍬 Мармеладные мишки", category="weed", subcategory="food", price=750, currency="RUB",
+            short_description="Мармелад", quantity=25,
+            description="Мармеладные мишки с ТГК.\n\nВес: 10 шт\nТГК: 10мг/шт\nЭффект: Мягкий"),
+    
+    Product(id=52, name="🧁 Карамельные кексы", category="weed", subcategory="food", price=850, currency="RUB",
+            short_description="Кексы", quantity=15,
+            description="Кексы с карамелью и каннабисом.\n\nВес: 1 шт\nТГК: 35мг\nЭффект: Сладкий"),
+    
+    Product(id=53, name="🍭 Леденцы", category="weed", subcategory="food", price=700, currency="RUB",
+            short_description="Леденцы", quantity=30,
+            description="Леденцы с экстрактом каннабиса.\n\nВес: 1 шт\nТГК: 15мг\nЭффект: Постепенный"),
+    
+    Product(id=54, name="🥮 Космические пирожные", category="weed", subcategory="food", price=950, currency="RUB",
+            short_description="Пирожные", quantity=12,
+            description="Пирожные с добавлением каннабиса.\n\nВес: 1 шт\nТГК: 40мг\nЭффект: Мощный"),
+    
+    Product(id=55, name="🧇 Вафли с начинкой", category="weed", subcategory="food", price=880, currency="RUB",
+            short_description="Вафли", quantity=16,
+            description="Вафли с каннабисной начинкой.\n\nВес: 1 шт\nТГК: 28мг\nЭффект: Сбалансированный"),
+    
+    Product(id=56, name="🍩 Пончики", category="weed", subcategory="food", price=820, currency="RUB",
+            short_description="Пончики", quantity=14,
+            description="Пончики с глазурью и каннабисом.\n\nВес: 1 шт\nТГК: 32мг\nЭффект: Веселый"),
+    
+    Product(id=57, name="🥐 Круассаны", category="weed", subcategory="food", price=780, currency="RUB",
+            short_description="Круассаны", quantity=17,
+            description="Круассаны с начинкой из каннабиса.\n\nВес: 1 шт\nТГК: 22мг\nЭффект: Легкий"),
+    
+    Product(id=58, name="🥞 Блинчики", category="weed", subcategory="food", price=720, currency="RUB",
+            short_description="Блинчики", quantity=22,
+            description="Блинчики с сиропом из каннабиса.\n\nВес: 2 шт\nТГК: 20мг/шт\nЭффект: Теплый"),
+    
+    Product(id=59, name="🍦 Мороженое", category="weed", subcategory="food", price=650, currency="RUB",
+            short_description="Мороженое", quantity=28,
+            description="Мороженое с экстрактом каннабиса.\n\nВес: 100г\nТГК: 50мг\nЭффект: Освежающий"),
+    
+    Product(id=60, name="🍰 Торт", category="weed", subcategory="food", price=1200, currency="RUB",
+            short_description="Торт", quantity=8,
+            description="Торт с добавлением каннабиса.\n\nВес: 1 кусок\nТГК: 60мг\nЭффект: Праздничный"),
+]
+
+# Товары для категории Марихуана -> Вейпы (12 товаров)
+WEED_VAPES_PRODUCTS = [
+    Product(id=61, name="💨 Disposable vape", category="weed", subcategory="vapes", price=2500, currency="RUB",
+            short_description="Одноразовый", quantity=10,
+            description="Одноразовый вейп с каннабисом.\n\nЗатяжек: 300\nТГК: 85%\nВкус: Ягодный"),
+    
+    Product(id=62, name="🪔 Картридж 510", category="weed", subcategory="vapes", price=2800, currency="RUB",
+            short_description="Картридж", quantity=8,
+            description="Картридж 510 с дистиллятом.\n\nОбъем: 1мл\nТГК: 90%\nВкус: Цитрусовый"),
+    
+    Product(id=63, name="🔋 Pod система", category="weed", subcategory="vapes", price=3200, currency="RUB",
+            short_description="Pod система", quantity=6,
+            description="Pod система с картриджами.\n\nКомплект: устройство + картридж\nТГК: 88%"),
+    
+    Product(id=64, name="💎 Live resin cart", category="weed", subcategory="vapes", price=3500, currency="RUB",
+            short_description="Live resin", quantity=5,
+            description="Картридж с live resin.\n\nОбъем: 0.5мл\nТГК: 92%\nВкус: Натуральный"),
+    
+    Product(id=65, name="🌿 Full spectrum", category="weed", subcategory="vapes", price=3300, currency="RUB",
+            short_description="Full spectrum", quantity=7,
+            description="Картридж с полным спектром.\n\nОбъем: 1мл\nТГК: 86%\nЭффект: Энтоураж"),
+    
+    Product(id=66, name="🍯 Honey oil vape", category="weed", subcategory="vapes", price=3000, currency="RUB",
+            short_description="Honey oil", quantity=9,
+            description="Вейп с медовым маслом.\n\nЗатяжек: 250\nТГК: 84%\nВкус: Медовый"),
+    
+    Product(id=67, name="❄️ Ice vape", category="weed", subcategory="vapes", price=2700, currency="RUB",
+            short_description="Ледяной", quantity=11,
+            description="Вейп с охлаждающим эффектом.\n\nЗатяжек: 280\nТГК: 82%\nВкус: Мятный"),
+    
+    Product(id=68, name="🔥 Fire cart", category="weed", subcategory="vapes", price=2900, currency="RUB",
+            short_description="Огненный", quantity=8,
+            description="Мощный картридж.\n\nОбъем: 1мл\nТГК: 91%\nВкус: Пряный"),
+    
+    Product(id=69, name="🌈 Rainbow vape", category="weed", subcategory="vapes", price=3100, currency="RUB",
+            short_description="Радужный", quantity=7,
+            description="Разноцветный вейп.\n\nЗатяжек: 260\nТГК: 87%\nВкусы: Микс"),
+    
+    Product(id=70, name="🌙 Night vape", category="weed", subcategory="vapes", price=2650, currency="RUB",
+            short_description="Ночной", quantity=10,
+            description="Вейп для вечернего использования.\n\nОбъем: 1мл\nТГК: 83%\nВкус: Ваниль"),
+    
+    Product(id=71, name="☀️ Day vape", category="weed", subcategory="vapes", price=2550, currency="RUB",
+            short_description="Дневной", quantity=12,
+            description="Вейп для дневного использования.\n\nЗатяжек: 270\nТГК: 80%\nВкус: Цитрус"),
+    
+    Product(id=72, name="⚡ Turbo vape", category="weed", subcategory="vapes", price=3400, currency="RUB",
+            short_description="Турбо", quantity=6,
+            description="Мощный турбо вейп.\n\nОбъем: 1.2мл\nТГК: 95%\nЭффект: Быстрый"),
+]
+
+# Товары для категории Марихуана -> Семена (12 товаров)
+WEED_SEEDS_PRODUCTS = [
+    Product(id=73, name="🌱 Феминизированные", category="weed", subcategory="seeds", price=500, currency="RUB",
+            short_description="Феминизированные", quantity=50,
+            description="Феминизированные семена.\n\nКоличество: 3 шт\nТип: Феминизированные\nУрожай: 400г/м²"),
+    
+    Product(id=74, name="🍃 Автоцветущие", category="weed", subcategory="seeds", price=600, currency="RUB",
+            short_description="Автоцветущие", quantity=40,
+            description="Автоцветущие семена.\n\nКоличество: 3 шт\nТип: Автоцвет\nПериод: 8-9 недель"),
+    
+    Product(id=75, name="🌿 Регулярные", category="weed", subcategory="seeds", price=450, currency="RUB",
+            short_description="Регулярные", quantity=60,
+            description="Регулярные семена.\n\nКоличество: 5 шт\nТип: Регулярные\nПол: 50/50"),
+    
+    Product(id=76, name="🌸 Фотопериодные", category="weed", subcategory="seeds", price=550, currency="RUB",
+            short_description="Фотопериодные", quantity=35,
+            description="Фотопериодные семена.\n\nКоличество: 3 шт\nТип: Фотопериод\nЦветение: 12/12"),
+    
+    Product(id=77, name="🌼 CBD семена", category="weed", subcategory="seeds", price=700, currency="RUB",
+            short_description="CBD семена", quantity=25,
+            description="Семена с высоким содержанием CBD.\n\nКоличество: 3 шт\nCBD: 15%\nТГК: <1%"),
+    
+    Product(id=78, name="🌺 High-THC", category="weed", subcategory="seeds", price=650, currency="RUB",
+            short_description="High-THC", quantity=30,
+            description="Семена с высоким ТГК.\n\nКоличество: 3 шт\nТГК: 25%+\nЭффект: Сильный"),
+    
+    Product(id=79, name="🌹 Редкие сорта", category="weed", subcategory="seeds", price=800, currency="RUB",
+            short_description="Редкие", quantity=20,
+            description="Редкие коллекционные семена.\n\nКоличество: 2 шт\nТип: Коллекционные\nРедкость: Высокая"),
+    
+    Product(id=80, name="💐 Миксы", category="weed", subcategory="seeds", price=480, currency="RUB",
+            short_description="Миксы", quantity=45,
+            description="Миксы различных сортов.\n\nКоличество: 10 шт\nТип: Микс\nРазнообразие: Высокое"),
+    
+    Product(id=81, name="🌾 Быстрорастущие", category="weed", subcategory="seeds", price=580, currency="RUB",
+            short_description="Быстрые", quantity=38,
+            description="Быстрорастущие семена.\n\nКоличество: 3 шт\nПериод: 7 недель\nУрожай: Быстрый"),
+    
+    Product(id=82, name="🎍 Компактные", category="weed", subcategory="seeds", price=520, currency="RUB",
+            short_description="Компактные", quantity=42,
+            description="Семена для небольших пространств.\n\nКоличество: 3 шт\nВысота: до 1м\nУрожай: 200г/м²"),
+    
+    Product(id=83, name="🌳 Высокие", category="weed", subcategory="seeds", price=620, currency="RUB",
+            short_description="Высокие", quantity=33,
+            description="Семена для высоких растений.\n\nКоличество: 3 шт\nВысота: 2-3м\nУрожай: 600г/м²"),
+    
+    Product(id=84, name="🎋 Клонируемые", category="weed", subcategory="seeds", price=750, currency="RUB",
+            short_description="Клонируемые", quantity=28,
+            description="Семена для клонирования.\n\nКоличество: 3 шт\nКлонирование: Легкое\nГенетика: Стабильная"),
+]
+
+# ========== СТИМУЛЯТОРЫ ==========
+
+# Товары для категории Стимуляторы -> Кокаин (12 товаров)
+
+STIM_COCAINE_PRODUCTS = [
+    Product(id=85, name="❄️ Перуанский снег", category="stim", subcategory="cocaine", price=5000, currency="RUB",
+            short_description="Высокая чистота", quantity=5,
+            description="Качественный кокаин высокой чистоты.\n\nВес: 0.5г\nЧистота: 85%\nПроисхождение: Перу"),
+    
+    Product(id=86, name="🏔️ Колумбийский лед", category="stim", subcategory="cocaine", price=5500, currency="RUB",
+            short_description="Колумбийское качество", quantity=4,
+            description="Классический колумбийский кокаин.\n\nВес: 0.5г\nЧистота: 88%\nПроисхождение: Колумбия"),
+    
+    Product(id=87, name="💎 Боливийские кристаллы", category="stim", subcategory="cocaine", price=6000, currency="RUB",
+            short_description="Кристальная чистота", quantity=3,
+            description="Чистейший кокаин в кристаллической форме.\n\nВес: 0.5г\nЧистота: 90%\nПроисхождение: Боливия"),
+    
+    Product(id=88, name="⚡ Молниеносный", category="stim", subcategory="cocaine", price=4800, currency="RUB",
+            short_description="Быстрый эффект", quantity=7,
+            description="Быстродействующий кокаин с мгновенным эффектом.\n\nВес: 0.5г\nЧистота: 80%\nЭффект: Быстрый"),
+    
+    Product(id=89, name="🌙 Ночной полет", category="stim", subcategory="cocaine", price=5200, currency="RUB",
+            short_description="Для вечеринок", quantity=6,
+            description="Идеален для ночных вечеринок и мероприятий.\n\nВес: 0.5г\nЧистота: 82%\nДлительность: 45 мин"),
+    
+    Product(id=90, name="👑 Королевский", category="stim", subcategory="cocaine", price=7000, currency="RUB",
+            short_description="Премиум класс", quantity=2,
+            description="Кокаин премиум-класса высочайшей чистоты.\n\nВес: 0.5г\nЧистота: 92%\nЭффект: Плавный"),
+    
+    Product(id=91, name="🌪️ Ураган", category="stim", subcategory="cocaine", price=5300, currency="RUB",
+            short_description="Мощный эффект", quantity=5,
+            description="Мощный кокаин с интенсивным эффектом.\n\nВес: 0.5г\nЧистота: 84%\nЭффект: Интенсивный"),
+    
+    Product(id=92, name="🦅 Орлиный глаз", category="stim", subcategory="cocaine", price=5800, currency="RUB",
+            short_description="Чистый фокус", quantity=4,
+            description="Помогает сконцентрироваться и повысить внимательность.\n\nВес: 0.5г\nЧистота: 86%\nЭффект: Фокусирующий"),
+    
+    Product(id=93, name="💫 Звездная пыль", category="stim", subcategory="cocaine", price=6200, currency="RUB",
+            short_description="Эйфоричный", quantity=3,
+            description="Вызывает чувство эйфории и благополучия.\n\nВес: 0.5г\nЧистота: 87%\nЭффект: Эйфоричный"),
+    
+    Product(id=94, name="🌅 Утренняя заря", category="stim", subcategory="cocaine", price=4900, currency="RUB",
+            short_description="Для начала дня", quantity=8,
+            description="Идеален для начала активного дня.\n\nВес: 0.5г\nЧистота: 81%\nЭффект: Бодрящий"),
+    
+    Product(id=95, name="🏆 Чемпион", category="stim", subcategory="cocaine", price=6500, currency="RUB",
+            short_description="Профессиональный", quantity=3,
+            description="Профессиональный кокаин для требовательных клиентов.\n\nВес: 0.5г\nЧистота: 89%\nКачество: Высшее"),
+    
+    Product(id=96, name="🌊 Океанская свежесть", category="stim", subcategory="cocaine", price=5400, currency="RUB",
+            short_description="Освежающий", quantity=6,
+            description="Освежающий кокаин с чистым эффектом.\n\nВес: 0.5г\nЧистота: 83%\nЭффект: Освежающий"),
+]
+
+# Товары для категории Стимуляторы -> Амфетамин (12 товаров)
+STIM_AMPHETAMINE_PRODUCTS = [
+    Product(id=97, name="⚡ Чистая энергия", category="stim", subcategory="amphetamine", price=3000, currency="RUB",
+            short_description="Классический амфетамин", quantity=10,
+            description="Классический амфетамин для энергии и фокуса.\n\nВес: 1г\nФорма: Порошок\nЭффект: 4-6 часов"),
+    
+    Product(id=98, name="🎯 Точечный фокус", category="stim", subcategory="amphetamine", price=3200, currency="RUB",
+            short_description="Для концентрации", quantity=8,
+            description="Амфетамин для улучшения концентрации и внимания.\n\nВес: 1г\nФорма: Кристаллы\nЭффект: Фокусирующий"),
+    
+    Product(id=99, name="🚀 Ракетное топливо", category="stim", subcategory="amphetamine", price=3500, currency="RUB",
+            short_description="Мощный заряд", quantity=6,
+            description="Мощный амфетамин для продолжительной активности.\n\nВес: 1г\nФорма: Таблетки\nЭффект: Длительный"),
+    
+    Product(id=100, name="💫 Звездная пыль", category="stim", subcategory="amphetamine", price=3100, currency="RUB",
+            short_description="Эйфоричный эффект", quantity=9,
+            description="Амфетамин с выраженным эйфорическим эффектом.\n\nВес: 1г\nФорма: Порошок\nЭффект: Эйфоричный"),
+    
+    Product(id=101, name="🌙 Ночной драйв", category="stim", subcategory="amphetamine", price=3400, currency="RUB",
+            short_description="Для ночи", quantity=7,
+            description="Амфетамин для ночных активностей.\n\nВес: 1г\nФорма: Кристаллы\nЭффект: Ночной"),
+    
+    Product(id=102, name="☀️ Солнечный заряд", category="stim", subcategory="amphetamine", price=2900, currency="RUB",
+            short_description="Для дня", quantity=11,
+            description="Амфетамин для дневной активности.\n\nВес: 1г\nФорма: Порошок\nЭффект: Дневной"),
+    
+    Product(id=103, name="🎭 Театральный порошок", category="stim", subcategory="amphetamine", price=3300, currency="RUB",
+            short_description="Для творчества", quantity=8,
+            description="Амфетамин для творческих людей.\n\nВес: 1г\nФорма: Порошок\nЭффект: Креативный"),
+    
+    Product(id=104, name="🏃‍♂️ Беговой", category="stim", subcategory="amphetamine", price=2800, currency="RUB",
+            short_description="Для спорта", quantity=12,
+            description="Амфетамин для спортивных активностей.\n\nВес: 1г\nФорма: Таблетки\nЭффект: Энергетический"),
+    
+    Product(id=105, name="💼 Бизнес класс", category="stim", subcategory="amphetamine", price=3700, currency="RUB",
+            short_description="Для работы", quantity=5,
+            description="Амфетамин для деловой активности.\n\nВес: 1г\nФорма: Кристаллы\nЭффект: Деловой"),
+    
+    Product(id=106, name="🎓 Учебный", category="stim", subcategory="amphetamine", price=3000, currency="RUB",
+            short_description="Для учебы", quantity=10,
+            description="Амфетамин для учебного процесса.\n\nВес: 1г\nФорма: Порошок\nЭффект: Учебный"),
+    
+    Product(id=107, name="🎮 Геймерский", category="stim", subcategory="amphetamine", price=3150, currency="RUB",
+            short_description="Для игр", quantity=9,
+            description="Амфетамин для геймеров.\n\nВес: 1г\nФорма: Порошок\nЭффект: Игровой"),
+    
+    Product(id=108, name="🎉 Праздничный", category="stim", subcategory="amphetamine", price=3600, currency="RUB",
+            short_description="Для праздников", quantity=6,
+            description="Амфетамин для праздничных мероприятий.\n\nВес: 1г\nФорма: Кристаллы\nЭффект: Праздничный"),
+]
+
+# Товары для категории Стимуляторы -> Метамфетамин (12 товаров)
+STIM_METH_PRODUCTS = [
+    Product(id=109, name="💎 Кристалл", category="stim", subcategory="meth", price=4000, currency="RUB",
+            short_description="Кристаллический", quantity=6,
+            description="Кристаллический метамфетамин.\n\nВес: 0.5г\nЧистота: 90%\nЭффект: 8-12 часов"),
+    
+    Product(id=110, name="🧊 Лед", category="stim", subcategory="meth", price=4200, currency="RUB",
+            short_description="Ледяной", quantity=5,
+            description="Метамфетамин ледяной чистоты.\n\nВес: 0.5г\nЧистота: 92%\nЭффект: Мощный"),
+    
+    Product(id=111, name="✨ Стекло", category="stim", subcategory="meth", price=4500, currency="RUB",
+            short_description="Стеклянный", quantity=4,
+            description="Метамфетамин стеклянной чистоты.\n\nВес: 0.5г\nЧистота: 94%\nЭффект: Интенсивный"),
+    
+    Product(id=112, name="🔥 Огонь", category="stim", subcategory="meth", price=3800, currency="RUB",
+            short_description="Огненный", quantity=7,
+            description="Мощный метамфетамин.\n\nВес: 0.5г\nЧистота: 88%\nЭффект: Огненный"),
+    
+    Product(id=113, name="⚡ Молния", category="stim", subcategory="meth", price=4100, currency="RUB",
+            short_description="Молниеносный", quantity=6,
+            description="Быстродействующий метамфетамин.\n\nВес: 0.5г\nЧистота: 89%\nЭффект: Быстрый"),
+    
+    Product(id=114, name="🌌 Галактика", category="stim", subcategory="meth", price=4700, currency="RUB",
+            short_description="Галактический", quantity=3,
+            description="Метамфетамин космического качества.\n\nВес: 0.5г\nЧистота: 96%\nЭффект: Космический"),
+    
+    Product(id=115, name="🎇 Фейерверк", category="stim", subcategory="meth", price=4300, currency="RUB",
+            short_description="Фейерверк", quantity=5,
+            description="Метамфетамин с ярким эффектом.\n\nВес: 0.5г\nЧистота: 91%\nЭффект: Яркий"),
+    
+    Product(id=116, name="🏔️ Гора", category="stim", subcategory="meth", price=3900, currency="RUB",
+            short_description="Горный", quantity=8,
+            description="Качественный горный метамфетамин.\n\nВес: 0.5г\nЧистота: 87%\nЭффект: Стабильный"),
+    
+    Product(id=117, name="🌪️ Торнадо", category="stim", subcategory="meth", price=4400, currency="RUB",
+            short_description="Торнадо", quantity=4,
+            description="Метамфетамин с вихревым эффектом.\n\nВес: 0.5г\nЧистота: 93%\nЭффект: Вихревой"),
+    
+    Product(id=118, name="💫 Комета", category="stim", subcategory="meth", price=4600, currency="RUB",
+            short_description="Кометный", quantity=3,
+            description="Редкий кометный метамфетамин.\n\nВес: 0.5г\nЧистота: 95%\nЭффект: Редкий"),
+    
+    Product(id=119, name="🌠 Метеор", category="stim", subcategory="meth", price=4000, currency="RUB",
+            short_description="Метеорный", quantity=6,
+            description="Метамфетамин метеорного качества.\n\nВес: 0.5г\nЧистота: 90%\nЭффект: Стремительный"),
+    
+    Product(id=120, name="🪐 Планета", category="stim", subcategory="meth", price=4800, currency="RUB",
+            short_description="Планетарный", quantity=2,
+            description="Элитный планетарный метамфетамин.\n\nВес: 0.5г\nЧистота: 97%\nЭффект: Элитный"),
+]
+
+# Товары для категории Стимуляторы -> A-PVP кристалы (12 товаров)
+STIM_APVP_PRODUCTS = [
+    Product(id=121, name="🔮 Кристаллы А-PVP", category="stim", subcategory="apvp", price=3500, currency="RUB",
+            short_description="Кристаллический", quantity=7,
+            description="Кристаллический A-PVP.\n\nВес: 0.5г\nЧистота: 85%\nЭффект: 3-4 часа"),
+    
+    Product(id=122, name="💎 Алмазные кристаллы", category="stim", subcategory="apvp", price=3800, currency="RUB",
+            short_description="Алмазные", quantity=5,
+            description="A-PVP алмазной чистоты.\n\nВес: 0.5г\nЧистота: 88%\nЭффект: Яркий"),
+    
+    Product(id=123, name="✨ Сверкающие", category="stim", subcategory="apvp", price=4000, currency="RUB",
+            short_description="Сверкающие", quantity=4,
+            description="Сверкающие кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 90%\nЭффект: Сверкающий"),
+    
+    Product(id=124, name="❄️ Ледяные кристаллы", category="stim", subcategory="apvp", price=3700, currency="RUB",
+            short_description="Ледяные", quantity=6,
+            description="Ледяные кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 87%\nЭффект: Охлаждающий"),
+    
+    Product(id=125, name="🔥 Огненные", category="stim", subcategory="apvp", price=3900, currency="RUB",
+            short_description="Огненные", quantity=5,
+            description="Огненные кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 89%\nЭффект: Огненный"),
+    
+    Product(id=126, name="🌈 Радужные", category="stim", subcategory="apvp", price=4200, currency="RUB",
+            short_description="Радужные", quantity=3,
+            description="Радужные кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 92%\nЭффект: Разноцветный"),
+    
+    Product(id=127, name="🌌 Космические", category="stim", subcategory="apvp", price=4100, currency="RUB",
+            short_description="Космические", quantity=4,
+            description="Космические кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 91%\nЭффект: Космический"),
+    
+    Product(id=128, name="🎇 Праздничные", category="stim", subcategory="apvp", price=3600, currency="RUB",
+            short_description="Праздничные", quantity=7,
+            description="Праздничные кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 86%\nЭффект: Праздничный"),
+    
+    Product(id=129, name="⚡ Энергетические", category="stim", subcategory="apvp", price=3800, currency="RUB",
+            short_description="Энергетические", quantity=6,
+            description="Энергетические кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 88%\nЭффект: Энергетический"),
+    
+    Product(id=130, name="🎯 Точные", category="stim", subcategory="apvp", price=3950, currency="RUB",
+            short_description="Точные", quantity=5,
+            description="Точные кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 90%\nЭффект: Точечный"),
+    
+    Product(id=131, name="💫 Пылающие", category="stim", subcategory="apvp", price=4050, currency="RUB",
+            short_description="Пылающие", quantity=4,
+            description="Пылающие кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 91%\nЭффект: Пылающий"),
+    
+    Product(id=132, name="🌟 Звездные", category="stim", subcategory="apvp", price=4300, currency="RUB",
+            short_description="Звездные", quantity=3,
+            description="Звездные кристаллы A-PVP.\n\nВес: 0.5г\nЧистота: 93%\nЭффект: Звездный"),
+]
+
+# Все товары в одном списке
+ALL_PRODUCTS = (
+    WEED_BUDS_PRODUCTS + 
+    WEED_HASH_PRODUCTS + 
+    WEED_PLAN_PRODUCTS + 
+    WEED_OIL_PRODUCTS + 
+    WEED_FOOD_PRODUCTS + 
+    WEED_VAPES_PRODUCTS + 
+    WEED_SEEDS_PRODUCTS + 
+    STIM_COCAINE_PRODUCTS + 
+    STIM_AMPHETAMINE_PRODUCTS + 
+    STIM_METH_PRODUCTS + 
+    STIM_APVP_PRODUCTS
+)
+
+def get_products_by_subcategory(category: str, subcategory: str):
+    """Получить товары по категории и подкатегории"""
+    return [p for p in ALL_PRODUCTS if p.category == category and p.subcategory == subcategory]
+
+def get_product_by_id(product_id: int):
+    """Получить товар по ID"""
+    for product in ALL_PRODUCTS:
+        if product.id == product_id:
+            return product
+    return None
