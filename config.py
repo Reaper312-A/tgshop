@@ -154,16 +154,3 @@ def get_metro_stations_for_city(city: str):
         return ["Центр", "Северный район", "Южный район", "Западный район", 
                 "Восточный район", "Вокзал", "Автовокзал", "Старый город"]
         
-# Настройки CryptoBot
-CRYPTOBOT_API_TOKEN = "503966:AATcIV7feGGNWQu25QtJfT7jnVSNZtNYDKd"
-CRYPTOBOT_TEST_MODE = False  # True для тестового режима
-
-# Настройки магазина
-SHOP_NAME = "Weeds Shop"
-SUPPORT_USERNAME = "@Api312"  # Ваш username для поддержки
-LOGGING_LEVEL = "INFO"
-
-# Комиссия и настройки
-COMMISSION_PERCENT = 5  # Процент комиссии магазина
-MIN_ORDER_AMOUNT = 500  # Минимальная сумма заказа в рублях
-DELIVERY_COST = 300  # Стоимость доставки

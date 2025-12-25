@@ -9,7 +9,6 @@ from handlers.start import router as start_router
 from handlers.city_metro import router as city_metro_router
 from handlers.main_menu import router as main_menu_router
 from handlers.products import router as products_router
-from handlers.payment import router as payment_router  # Добавляем
 
 # Настройка логирования
 logging.basicConfig(
@@ -29,7 +28,6 @@ async def main():
     dp.include_router(start_router)
     dp.include_router(city_metro_router)
     dp.include_router(products_router)
-    dp.include_router(payment_router)  # Добавляем
     dp.include_router(main_menu_router)
     
     # Запуск бота
