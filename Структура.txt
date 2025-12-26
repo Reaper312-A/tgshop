@@ -1,24 +1,58 @@
-telegram_bot/
-├── bot.py
-├── config.py
+вот мой проект https://github.com/Reaper312-A/tgshop
+а ниже ссылки на модули которые в папке, скинь мне структуру моего проекта
+https://github.com/Reaper312-A/tgshop/blob/main/data/products.py
+https://github.com/Reaper312-A/tgshop/blob/main/database/database.py
+https://github.com/Reaper312-A/tgshop/blob/main/database/models.py
+https://github.com/Reaper312-A/tgshop/blob/main/handlers/catalog.py
+https://github.com/Reaper312-A/tgshop/blob/main/handlers/city_metro.py
+https://github.com/Reaper312-A/tgshop/blob/main/handlers/main_menu.py
+https://github.com/Reaper312-A/tgshop/blob/main/handlers/products.py
+https://github.com/Reaper312-A/tgshop/blob/main/handlers/start.py
+https://github.com/Reaper312-A/tgshop/blob/main/keyboards/products.py 
+https://github.com/Reaper312-A/tgshop/blob/main/keyboards/inline.py
+https://github.com/Reaper312-A/tgshop/blob/main/utils/photos.py
+не забывай про __init__.py в папках запомни это будем работать с этим кодом
+
+TGSHOP/
+├── bot.py                          # Главный файл запуска бота
+├── config.py                       # ВСЕ настройки: токен, города, метро, настройки БД
+├── requirements.txt                # Зависимости Python
+├── .gitignore                      # Игнорируемые файлы Git
+│
 ├── data/
 │   ├── __init__.py
-│   └── products.py
+│   └── products.py                 # 4 категории: Шишки, Гашиш, Масло, Еда
+│
 ├── database/
 │   ├── __init__.py
-│   ├── models.py
-│   └── database.py
+│   ├── models.py                   # Модели SQLAlchemy
+│   ├── database.py                 # Работа с SQLite
+│   └── bot_database.db            # Файл БД SQLite
+│
 ├── keyboards/
 │   ├── __init__.py
-│   ├── inline.py
-│   └── products.py
+│   ├── inline.py                   # Инлайн-клавиатуры
+│   └── products.py                 # Клавиатуры товаров
+│
 ├── handlers/
 │   ├── __init__.py
-│   ├── start.py
-│   ├── city_metro.py
-│   ├── main_menu.py
-│   └── products.py
-└── requirements.txt
-    # ========== СТИМУЛЯТОРЫ ==========
+│   ├── start.py                    # /start
+│   ├── city_metro.py               # Город/метро
+│   ├── main_menu.py                # Главное меню
+│   └── products.py                 # Товары
+│
+├── utils/
+│   ├── __init__.py
+│   └── photos.py                   # Работа с фото
+│
+└── photos/                         # Папка с фото
+    ├── categories/                 # Обзорные фото (12 штук)
+    └── products/                   # Детальные фото (48 штук)
+
+
+
+
+
+
 
 

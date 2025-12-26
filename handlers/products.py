@@ -10,7 +10,9 @@ from keyboards.inline import (
     get_sports_subcategories_keyboard
 )
 from utils.photos import get_category_photo_file, get_product_photo_file
+from utils.payments import CryptoPayment
 
+crypto_pay = CryptoPayment()
 router = Router()
 
 # Храним состояние для каждого пользователя
@@ -38,16 +40,60 @@ async def show_products_page(callback: CallbackQuery, user_id: int, page: int = 
         "food": "🍪 Cannafood",
     }
     
-    category_name = category_names.get(subcategory, "Товары")
+    # Для категории "all" показываем общее название
+    if subcategory == "all":
+        category_name = "🌿 Все товары"
+    else:
+        category_name = category_names.get(subcategory, "Товары")
     
-    # Получаем фото категории для конкретной страницы
-    category_photo = get_category_photo_file(category, subcategory, page)
+    # Получаем фото категории
+    # ДЛЯ ПОДКАТЕГОРИИ "ALL" ПОКАЗЫВАЕМ ФОТО ИЗ РАЗНЫХ ПОДКАТЕГОРИЙ
+    if subcategory == "all":
+        # Список всех подкатегорий в правильном порядке
+        all_subcategories = ["buds", "hash", "oil", "food"]
+        
+        # Определяем, какую подкатегорию показывать на этой странице
+        # Каждые 2 страницы меняем подкатегорию
+        subcat_index = (page // 2) % len(all_subcategories)
+        display_subcategory = all_subcategories[subcat_index]
+        
+        # Для разнообразия: если на странице есть товары конкретной подкатегории,
+        # показываем фото этой подкатегории
+        current_products = products[page*4:page*4+4] if page*4 < len(products) else []
+        if current_products:
+            # Пробуем определить доминирующую подкатегорию на странице
+            subcats_on_page = [p.subcategory for p in current_products if hasattr(p, 'subcategory')]
+            if subcats_on_page:
+                # Берем самую частую подкатегорию на странице
+                from collections import Counter
+                most_common = Counter(subcats_on_page).most_common(1)
+                if most_common:
+                    display_subcategory = most_common[0][0]
+    else:
+        display_subcategory = subcategory
+    
+    # Получаем фото (используем page % 3 чтобы циклически проходить по фото)
+    photo_page = (page % 3) + 1  # 1, 2, 3, 1, 2, 3...
+    category_photo = get_category_photo_file(category, display_subcategory, photo_page - 1)
     
     # Формируем подпись
     total_pages = (len(products) + 3) // 4  # 4 товара на страницу
     caption = f"{category_name}\n\n"
     caption += f"Страница: {page + 1}/{total_pages}\n"
-    caption += f"Найдено товаров: {len(products)}\n"
+    
+    # Для "Всех товаров" показываем информацию о подкатегориях
+    if subcategory == "all":
+        # Подсчитываем товары по подкатегориям
+        from collections import Counter
+        subcat_counts = Counter([p.subcategory for p in products if hasattr(p, 'subcategory')])
+        
+        caption += f"🌿 Шишки: {subcat_counts.get('buds', 0)} | "
+        caption += f"🍫 Гашиш: {subcat_counts.get('hash', 0)} | "
+        caption += f"💧 Масло: {subcat_counts.get('oil', 0)} | "
+        caption += f"🍪 Еда: {subcat_counts.get('food', 0)}\n"
+    else:
+        caption += f"Найдено товаров: {len(products)}\n"
+    
     caption += "Выберите товар для подробной информации:"
     
     # Если сообщение уже содержит фото, редактируем его
@@ -67,7 +113,9 @@ async def show_products_page(callback: CallbackQuery, user_id: int, page: int = 
             caption=caption,
             reply_markup=get_products_grid_keyboard(products, page=page)
         )
-
+    
+    await callback.answer()
+        
 @router.callback_query(F.data.startswith("subcat_"))
 async def show_products(callback: CallbackQuery, state: FSMContext):
     """Показать товары выбранной подкатегории с фото"""
@@ -81,7 +129,6 @@ async def show_products(callback: CallbackQuery, state: FSMContext):
         "subcat_hash": ("weed", "hash"),
         "subcat_oil": ("weed", "oil"),
         "subcat_food": ("weed", "food"),
-        "subcat_all_weed": ("weed", "all"),
     }
     
     if subcat not in subcategory_map:
@@ -182,6 +229,119 @@ async def show_product_detail(callback: CallbackQuery):
     )
     await callback.answer()
 
+@router.callback_query(F.data.startswith("buy_product_"))
+async def process_buy_product(callback: CallbackQuery):
+    """Обработка нажатия на кнопку покупки товара"""
+    try:
+        # Получаем ID товара из callback_data (формат: buy_product_1)
+        product_id = int(callback.data.split("_")[2])
+        product = get_product_by_id(product_id)
+        
+        if not product:
+            await callback.answer("Товар не найден!")
+            return
+        
+        # Создаем платежную ссылку
+        payment_result = await crypto_pay.create_invoice(
+            amount=product.price,
+            currency="RUB"
+        )
+        
+        if not payment_result["success"]:
+            await callback.answer(f"Ошибка: {payment_result.get('error', 'Неизвестная ошибка')}")
+            return
+        
+        # Создаем клавиатуру
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        
+        payment_keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="💳 Оплатить сейчас",
+                        url=payment_result["pay_url"]
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="✅ Проверить оплату",
+                        callback_data=f"check_payment_{payment_result['invoice_id']}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="🔙 Назад к товару",
+                        callback_data=f"product_{product_id}"
+                    )
+                ]
+            ]
+        )
+        
+        # Формируем текст для замены
+        payment_text = (
+            f"💳 *Оплата товара*\n\n"
+            f"*Товар:* {product.name}\n"
+            f"*Цена:* {product.price} руб.\n\n"
+            f"1. Нажмите кнопку '💳 Оплатить сейчас'\n"
+            f"2. Оплатите счет\n"
+            f"3. Вернитесь в бот и нажмите '✅ Проверить оплату'\n\n"
+            f"*После оплаты вы получите адрес самовывоза.*"
+        )
+        
+        # ВАЖНО: Проверяем, является ли сообщение фото или текстом
+        if callback.message.photo:
+            # Если сообщение содержит фото - меняем подпись и клавиатуру
+            await callback.message.edit_caption(
+                caption=payment_text,
+                reply_markup=payment_keyboard,
+                parse_mode="Markdown"
+            )
+        else:
+            # Если сообщение текстовое - меняем текст и клавиатуру
+            await callback.message.edit_text(
+                payment_text,
+                reply_markup=payment_keyboard,
+                parse_mode="Markdown"
+            )
+        
+        await callback.answer()
+        
+    except Exception as e:
+        import logging
+        logging.error(f"Ошибка при покупке товара: {e}")
+        await callback.answer("Произошла ошибка. Попробуйте позже.")
+
+@router.callback_query(F.data.startswith("check_payment_"))
+async def check_payment_status(callback: CallbackQuery):
+    """Проверка статуса платежа"""
+    try:
+        invoice_id = int(callback.data.split("_")[2])
+        
+        # Проверяем статус платежа
+        payment_status = await crypto_pay.check_payment(invoice_id)
+        
+        if payment_status["paid"]:
+            # Платеж успешен
+            await callback.message.answer(
+                "✅ *Оплата подтверждена!*\n\n"
+                "📞 *Свяжитесь с оператором для получения адреса:*\n"
+                "👤 @оператор_телеграм\n\n"
+                "⏰ *Время работы:*\n"
+                "Круглосуточно\n\n"
+                "📍 *Как получить заказ:*\n"
+                "1. Напишите оператору\n"
+                "2. Назовите номер счета\n"
+                "3. Получите адрес самовывоза",
+                parse_mode="Markdown"
+            )
+        else:
+            await callback.answer("Оплата еще не поступила. Если вы оплатили, подождите несколько минут.")
+            
+    except Exception as e:
+        import logging
+        logging.error(f"Ошибка при проверке платежа: {e}")
+        await callback.answer("Ошибка проверки платежа")
+
 @router.callback_query(F.data.startswith("back_to_products_"))
 async def back_to_products(callback: CallbackQuery):
     """Возврат к списку товаров"""
@@ -244,3 +404,4 @@ async def back_to_subcategories(callback: CallbackQuery):
         )
     
     await callback.answer()
+    

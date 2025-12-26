@@ -158,7 +158,6 @@ def get_weed_subcategories_keyboard():
         ("🍫 Гашиш", "subcat_hash"),
         ("💧 Масло/Концентраты", "subcat_oil"),
         ("🍪 Ganjafood", "subcat_food"),
-        ("📂 Все категории", "subcat_all_weed"),
         ("◀️ Назад", "back_to_catalog"),
     ]
     
@@ -181,7 +180,6 @@ def get_job_subcategories_keyboard():
         ("🚛 Перевозчик", "subcat_transport"),
         ("💻 Модератор", "subcat_moderator"),
         ("💪 Спортик", "subcat_sportik_job"),
-        ("📂 Все категории", "subcat_all_job"),
         ("◀️ Назад", "back_to_catalog"),
     ]
     
@@ -201,7 +199,6 @@ def get_sports_subcategories_keyboard():
     subcategories = [
         ("💊 Спортики", "subcat_sport_pills"),
         ("🔍 Пробить человека", "subcat_search_person"),
-        ("📂 Все категории", "subcat_all_sports"),
         ("◀️ Назад", "back_to_catalog"),
     ]
     

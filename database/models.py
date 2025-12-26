@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 @dataclass
 class User:
@@ -18,7 +19,6 @@ class UserSettings:
     metro: str = None
     created_at: datetime = None
 
-# Модель товара оставляем на будущее
 @dataclass
 class Product:
     id: int
@@ -30,3 +30,16 @@ class Product:
     description: str
     quantity: int
     created_at: datetime = None
+
+# НОВАЯ МОДЕЛЬ ДЛЯ ЗАКАЗОВ (минимальная)
+@dataclass
+class Order:
+    id: int
+    user_id: int
+    product_id: int
+    invoice_id: Optional[int] = None  # ID платежа в CryptoPay
+    amount: float = 0.0
+    status: str = "pending"  # pending, paid, cancelled
+    payment_url: Optional[str] = None  # Ссылка для оплаты
+    created_at: datetime = None
+    updated_at: datetime = None

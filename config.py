@@ -154,3 +154,5 @@ def get_metro_stations_for_city(city: str):
         return ["Центр", "Северный район", "Южный район", "Западный район", 
                 "Восточный район", "Вокзал", "Автовокзал", "Старый город"]
         
+# Конфигурация CryptoPay (Crystal Pay)
+CRYPTO_PAY_TOKEN = "503966:AAvv3OORSIjjFF2ABOG9iISS0cEIRLeapMe"

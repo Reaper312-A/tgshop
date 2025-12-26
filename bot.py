@@ -2,6 +2,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+from handlers.payments import router as payments_router
 
 from config import BOT_TOKEN
 from database.database import init_db
@@ -29,6 +30,7 @@ async def main():
     dp.include_router(city_metro_router)
     dp.include_router(products_router)
     dp.include_router(main_menu_router)
+    dp.include_router(payments_router)
     
     # Запуск бота
     await dp.start_polling(bot)

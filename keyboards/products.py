@@ -58,21 +58,25 @@ def get_products_grid_keyboard(products: List[Product], page: int = 0, products_
     
     return builder.as_markup()
 
-def get_product_detail_keyboard(product, category: str, subcategory: str):
+def get_product_detail_keyboard(product, category, subcategory):
     """Клавиатура для детального просмотра товара"""
-    builder = InlineKeyboardBuilder()
+    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
     
-    # Кнопка покупки
-    builder.add(InlineKeyboardButton(
-        text=f"🛒 Купить ({product.price} {product.currency})",
-        callback_data=f"buy_{product.id}"
-    ))
+    # Основная кнопка покупки
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                text=f"💰 Купить за {product.price} руб.",
+                callback_data=f"buy_product_{product.id}"  # Изменено!
+            )
+        ],
+        [
+            InlineKeyboardButton(text="◀️ Назад", callback_data=f"back_to_products_{category}_{subcategory}"),
+            InlineKeyboardButton(text="🏠 Главное меню", callback_data="main_menu")
+        ]
+    ]
     
-    # Кнопка назад к товарам
-    builder.add(InlineKeyboardButton(
-        text="◀️ Назад к товарам",
-        callback_data=f"back_to_products_{category}_{subcategory}"
-    ))
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
     
-    builder.adjust(1)
-    return builder.as_markup()
+  #  builder.adjust(1)
+   # return builder.as_markup()
