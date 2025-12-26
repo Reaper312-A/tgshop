@@ -1,23 +1,52 @@
 from aiogram import Router, types
+from aiogram.types import CallbackQuery
 import logging
 
 from utils.payments_fixed import CryptoPaymentFixed
-from database.database import (
-    create_order,
-    update_order_status,
-    get_order_by_invoice
-)
+from database.database import create_order, update_order_status, get_order_by_invoice
 from data.products import get_product_by_id
 
-logger = logging.getLogger(__name__)
 router = Router()
+logger = logging.getLogger(__name__)
 
 crypto_pay = CryptoPaymentFixed()
 
 
+# ===================== УНИВЕРСАЛЬНАЯ КЛАВИАТУРА ОПЛАТЫ =====================
+def build_payment_keyboard(pay_url: str, invoice_id: int, product_id: int) -> types.InlineKeyboardMarkup:
+    return types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                types.InlineKeyboardButton(
+                    text="💳 Оплатить сейчас",
+                    url=pay_url
+                )
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text="✅ Проверить оплату",
+                    callback_data=f"check_payment_{invoice_id}"
+                )
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text="❓ Инструкция",
+                    callback_data="payment_instructions"
+                )
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text="🔙 Назад к товару",
+                    callback_data=f"product_{product_id}"
+                )
+            ]
+        ]
+    )
+
+
 # ===================== ПОКУПКА ТОВАРА =====================
 @router.callback_query(lambda c: c.data.startswith("buy_product_"))
-async def process_buy_product(callback: types.CallbackQuery):
+async def process_buy_product(callback: CallbackQuery):
     logger.info(f"🚀 buy_product | {callback.data}")
 
     try:
@@ -50,44 +79,27 @@ async def process_buy_product(callback: types.CallbackQuery):
             f"<b>{product.name}</b>\n"
             f"Цена: {payment_result['amount_crypto']} USDT\n"
             f"ID заказа: #{order_id}\n\n"
-            "После оплаты вы получите адрес самовывоза."
+            "После оплаты вы получите адрес."
         )
 
-        keyboard = types.InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    types.InlineKeyboardButton(
-                        text="💳 Оплатить сейчас",
-                        url=payment_result["pay_url"]
-                    )
-                ],
-                [
-                    types.InlineKeyboardButton(
-                        text="✅ Проверить оплату",
-                        callback_data=f"check_payment_{payment_result['invoice_id']}"
-                    )
-                ],
-                [
-                    types.InlineKeyboardButton(
-                        text="❓ Инструкция",
-                        callback_data="payment_instructions"
-                    )
-                ],
-                [
-                    types.InlineKeyboardButton(
-                        text="🔙 Назад к товару",
-                        callback_data=f"product_{product_id}"
-                    )
-                ]
-            ]
+        keyboard = build_payment_keyboard(
+            pay_url=payment_result["pay_url"],
+            invoice_id=payment_result["invoice_id"],
+            product_id=product_id
         )
 
-        await callback.answer()
+        # Удаляем старое сообщение и отправляем новое
+        try:
+            await callback.message.delete()
+        except:
+            pass  # если удаление не удалось — продолжаем
+
         await callback.message.answer(
             menu_text,
             reply_markup=keyboard,
             parse_mode="HTML"
         )
+        await callback.answer()
 
     except Exception as e:
         logger.exception(e)
@@ -96,7 +108,7 @@ async def process_buy_product(callback: types.CallbackQuery):
 
 # ===================== ПРОВЕРКА ПЛАТЕЖА =====================
 @router.callback_query(lambda c: c.data.startswith("check_payment_"))
-async def check_payment_status(callback: types.CallbackQuery):
+async def check_payment_status(callback: CallbackQuery):
     try:
         invoice_id = int(callback.data.split("_")[2])
         payment_status = await crypto_pay.check_payment(invoice_id)
@@ -133,12 +145,12 @@ async def check_payment_status(callback: types.CallbackQuery):
 
 # ===================== ИНСТРУКЦИЯ =====================
 @router.callback_query(lambda c: c.data == "payment_instructions")
-async def show_payment_instructions(callback: types.CallbackQuery):
+async def show_payment_instructions(callback: CallbackQuery):
     text = (
         "<b>💡 Инструкция по оплате</b>\n\n"
-        "1️⃣ Нажмите «Оплатить сейчас»\n"
+        "1️⃣ Нажмите «💳 Оплатить сейчас»\n"
         "2️⃣ Оплатите USDT через CryptoBot\n"
-        "3️⃣ Вернитесь и нажмите «Проверить оплату»\n\n"
+        "3️⃣ Вернитесь и нажмите «✅ Проверить оплату»\n\n"
         "<b>⚠️ Важно:</b>\n"
         "• Только USDT\n"
         "• Сеть TRC20\n"
@@ -152,7 +164,7 @@ async def show_payment_instructions(callback: types.CallbackQuery):
 
 # ===================== НАЗАД К ТОВАРУ =====================
 @router.callback_query(lambda c: c.data.startswith("product_"))
-async def back_to_product(callback: types.CallbackQuery):
+async def back_to_product(callback: CallbackQuery):
     try:
         product_id = int(callback.data.split("_")[1])
         product = get_product_by_id(product_id)
@@ -179,7 +191,13 @@ async def back_to_product(callback: types.CallbackQuery):
             ]
         )
 
-        await callback.message.edit_text(
+        # Удаляем старое сообщение, чтобы чат не засорялся
+        try:
+            await callback.message.delete()
+        except:
+            pass
+
+        await callback.message.answer(
             text,
             reply_markup=keyboard,
             parse_mode="HTML"

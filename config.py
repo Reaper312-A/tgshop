@@ -1,5 +1,5 @@
 import os
-BOT_TOKEN = "7777305320:AAHyyJxGRt1OYsftWbGQKDFed0s6F6mEgc0"
+BOT_TOKEN = "7692376496:AAEphx6tZYq-M5aUqeLXdY5MzZ3zFESF0ss"
 
 
 # Базовый путь к проекту

@@ -219,3 +219,30 @@ def get_back_keyboard(target: str = "main_menu"):
         callback_data=f"back_to_{target}"
     ))
     return builder.as_markup()
+
+def payment_keyboard(payment_url: str) -> InlineKeyboardMarkup:
+    """
+    Клавиатура оплаты с кнопкой инструкции
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="💳 Оплатить",
+                    url=payment_url
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📖 Инструкция по оплате",
+                    callback_data="payment_instruction"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔙 В меню",
+                    callback_data="main_menu"
+                )
+            ]
+        ]
+    )
