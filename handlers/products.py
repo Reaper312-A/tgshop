@@ -268,12 +268,7 @@ async def process_buy_product(callback: CallbackQuery):
                         callback_data=f"check_payment_{payment_result['invoice_id']}"
                     )
                 ],
-                [
-                    InlineKeyboardButton(
-                        text="❓ Инструкция",
-                        callback_data="payment_instructions"
-                )
-                ],
+
                 [
                     InlineKeyboardButton(
                         text="🔙 Назад к товару",
@@ -291,6 +286,7 @@ async def process_buy_product(callback: CallbackQuery):
             f"1. Нажмите кнопку '💳 Оплатить сейчас'\n"
             f"2. Оплатите счет\n"
             f"3. Вернитесь в бот и нажмите '✅ Проверить оплату'\n\n"
+            f"Если не умете пользоваться криптой, есть СБП @Api312'\n\n"
             f"*После оплаты вы получите адрес.*"
         )
         

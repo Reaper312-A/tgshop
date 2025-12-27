@@ -29,12 +29,6 @@ def build_payment_keyboard(pay_url: str, invoice_id: int, product_id: int) -> ty
             ],
             [
                 types.InlineKeyboardButton(
-                    text="❓ Инструкция",
-                    callback_data="payment_instructions"
-                )
-            ],
-            [
-                types.InlineKeyboardButton(
                     text="🔙 Назад к товару",
                     callback_data=f"product_{product_id}"
                 )
@@ -42,23 +36,7 @@ def build_payment_keyboard(pay_url: str, invoice_id: int, product_id: int) -> ty
         ]
     )
 
-# ===================== ИНСТРУКЦИЯ =====================
-@router.callback_query(lambda c: c.data == "payment_instructions")
-async def show_payment_instructions(callback: CallbackQuery):
-    text = (
-        "<b>💡 Инструкция по оплате</b>\n\n"
-        "1️⃣ Нажмите «💳 Оплатить сейчас»\n"
-        "2️⃣ Оплатите USDT через CryptoBot\n"
-        "3️⃣ Вернитесь и нажмите «✅ Проверить оплату»\n\n"
-        "<b>⚠️ Важно:</b>\n"
-        "• Только USDT\n"
-        "• Сеть TRC20\n"
-        "• Время зачисления: 1–10 минут\n"
-        "• Счет действует 60 минут"
-    )
 
-    await callback.message.answer(text, parse_mode="HTML")
-    await callback.answer()
     
 # ===================== ПОКУПКА ТОВАРА =====================
 @router.callback_query(lambda c: c.data.startswith("buy_product_"))
