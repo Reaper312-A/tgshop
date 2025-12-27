@@ -28,9 +28,9 @@ async def main():
     # Регистрация роутеров
     dp.include_router(start_router)
     dp.include_router(city_metro_router)
-    dp.include_router(products_router)
+    dp.include_router(products_router)  
     dp.include_router(main_menu_router)
-    dp.include_router(payments_router)
+    dp.include_router(payments_router) 
     
     # Запуск бота
     await dp.start_polling(bot)

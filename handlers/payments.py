@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 crypto_pay = CryptoPaymentFixed()
 
-
 # ===================== УНИВЕРСАЛЬНАЯ КЛАВИАТУРА ОПЛАТЫ =====================
 def build_payment_keyboard(pay_url: str, invoice_id: int, product_id: int) -> types.InlineKeyboardMarkup:
     return types.InlineKeyboardMarkup(
@@ -43,7 +42,24 @@ def build_payment_keyboard(pay_url: str, invoice_id: int, product_id: int) -> ty
         ]
     )
 
+# ===================== ИНСТРУКЦИЯ =====================
+@router.callback_query(lambda c: c.data == "payment_instructions")
+async def show_payment_instructions(callback: CallbackQuery):
+    text = (
+        "<b>💡 Инструкция по оплате</b>\n\n"
+        "1️⃣ Нажмите «💳 Оплатить сейчас»\n"
+        "2️⃣ Оплатите USDT через CryptoBot\n"
+        "3️⃣ Вернитесь и нажмите «✅ Проверить оплату»\n\n"
+        "<b>⚠️ Важно:</b>\n"
+        "• Только USDT\n"
+        "• Сеть TRC20\n"
+        "• Время зачисления: 1–10 минут\n"
+        "• Счет действует 60 минут"
+    )
 
+    await callback.message.answer(text, parse_mode="HTML")
+    await callback.answer()
+    
 # ===================== ПОКУПКА ТОВАРА =====================
 @router.callback_query(lambda c: c.data.startswith("buy_product_"))
 async def process_buy_product(callback: CallbackQuery):
@@ -79,9 +95,10 @@ async def process_buy_product(callback: CallbackQuery):
             f"<b>{product.name}</b>\n"
             f"Цена: {payment_result['amount_crypto']} USDT\n"
             f"ID заказа: #{order_id}\n\n"
+            "🎯 ТЕСТ: Новое описание работает! 🎯\n\n"
             "После оплаты вы получите адрес."
         )
-
+        
         keyboard = build_payment_keyboard(
             pay_url=payment_result["pay_url"],
             invoice_id=payment_result["invoice_id"],
@@ -143,23 +160,7 @@ async def check_payment_status(callback: CallbackQuery):
         await callback.answer("⚠️ Ошибка проверки платежа", show_alert=True)
 
 
-# ===================== ИНСТРУКЦИЯ =====================
-@router.callback_query(lambda c: c.data == "payment_instructions")
-async def show_payment_instructions(callback: CallbackQuery):
-    text = (
-        "<b>💡 Инструкция по оплате</b>\n\n"
-        "1️⃣ Нажмите «💳 Оплатить сейчас»\n"
-        "2️⃣ Оплатите USDT через CryptoBot\n"
-        "3️⃣ Вернитесь и нажмите «✅ Проверить оплату»\n\n"
-        "<b>⚠️ Важно:</b>\n"
-        "• Только USDT\n"
-        "• Сеть TRC20\n"
-        "• Время зачисления: 1–10 минут\n"
-        "• Счет действует 60 минут"
-    )
 
-    await callback.message.answer(text, parse_mode="HTML")
-    await callback.answer()
 
 
 # ===================== НАЗАД К ТОВАРУ =====================
