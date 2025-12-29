@@ -29,6 +29,11 @@ async def show_products_page(callback: CallbackQuery, user_id: int, page: int = 
     category = data["category"]
     subcategory = data["subcategory"]
     
+    # Для категорий "job" и "sports" показываем просто список
+    if category in ["job", "sports"]:
+        await show_job_or_sports_list(callback, products, category, subcategory, page)
+        return
+    
     # Обновляем текущую страницу
     data["page"] = page
     
@@ -38,6 +43,12 @@ async def show_products_page(callback: CallbackQuery, user_id: int, page: int = 
         "hash": "🍫 Гашиш",
         "oil": "💧 Масло/Вэйп",
         "food": "🍪 Cannafood",
+        "courier": "🚚 Работа курьером",
+        "transport": "🚛 Работа перевозчиком",
+        "moderator": "💻 Работа модератором",
+        "sportik": "💪 Работа спортиком",
+        "player": "🥊 Спортик на соревнования",  # Изменено с "pills" на "player"
+        "search": "🔍 Пробив человека",
     }
     
     # Для категории "all" показываем общее название
@@ -115,10 +126,70 @@ async def show_products_page(callback: CallbackQuery, user_id: int, page: int = 
         )
     
     await callback.answer()
+
+async def show_job_or_sports_list(callback: CallbackQuery, products, category: str, subcategory: str, page: int = 0):
+    """Показать список работ или спортиков/пробива (без фото)"""
+    if not products:
+        from keyboards.inline import get_back_keyboard
+        await callback.message.edit_text(
+            "😔 В этой категории пока нет позиций.\n",
+            reply_markup=get_back_keyboard("catalog")
+        )
+        await callback.answer()
+        return
+    
+    # Показываем первый продукт из списка
+    product = products[0] if products else None
+    
+    if product:
+        text = f"*{product.name}*\n\n{product.description}"
+        
+        # Для работ (цена 0) показываем только кнопку "Назад"
+        if category == "job":
+            from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+            keyboard = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="◀️ Назад к подкатегориям",
+                            callback_data="back_to_subcategories"
+                        )
+                    ]
+                ]
+            )
+        else:
+            # Для спортиков/пробива показываем кнопку покупки
+            from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+            keyboard = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text=f"💰 Купить за {product.price} руб.",
+                            callback_data=f"buy_product_{product.id}"
+                        )
+                    ],
+                    [
+                        InlineKeyboardButton(
+                            text="◀️ Назад к подкатегориям",
+                            callback_data="back_to_subcategories"
+                        )
+                    ]
+                ]
+            )
+        
+        # Удаляем старое сообщение и отправляем новое
+        await callback.message.delete()
+        await callback.message.answer(
+            text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+    
+    await callback.answer()
         
 @router.callback_query(F.data.startswith("subcat_"))
 async def show_products(callback: CallbackQuery, state: FSMContext):
-    """Показать товары выбранной подкатегории с фото"""
+    """Показать товары/работы/спортики выбранной подкатегории"""
     
     subcat = callback.data
     
@@ -129,6 +200,14 @@ async def show_products(callback: CallbackQuery, state: FSMContext):
         "subcat_hash": ("weed", "hash"),
         "subcat_oil": ("weed", "oil"),
         "subcat_food": ("weed", "food"),
+        # Работа
+        "subcat_courier": ("job", "courier"),
+        "subcat_transport": ("job", "transport"),
+        "subcat_moderator": ("job", "moderator"),
+        "subcat_sportik_job": ("job", "sportik"),
+        # Спортики/Пробив
+        "subcat_sport_pills": ("sports", "player"),  # Изменено с "pills" на "player"
+        "subcat_search_person": ("sports", "search"),
     }
     
     if subcat not in subcategory_map:
@@ -143,7 +222,7 @@ async def show_products(callback: CallbackQuery, state: FSMContext):
         current_subcategory=subcategory
     )
     
-    # Получаем товары
+    # Получаем товары/работы/спортики
     if subcategory == "all":
         # Для "Все категории" показываем все товары категории
         from data.products import ALL_PRODUCTS
@@ -154,7 +233,7 @@ async def show_products(callback: CallbackQuery, state: FSMContext):
     if not products:
         from keyboards.inline import get_back_keyboard
         await callback.message.edit_text(
-            "😔 В этой категории пока нет товаров.\n"
+            "😔 В этой категории пока нет позиций.\n"
             "Скоро они появятся!",
             reply_markup=get_back_keyboard("catalog")
         )
@@ -170,18 +249,218 @@ async def show_products(callback: CallbackQuery, state: FSMContext):
         "subcategory": subcategory
     }
     
-    # Показываем первую страницу
-    await show_products_page(callback, user_id, page=0)
+    # Для категорий "job" и "sports" показываем список
+    if category in ["job", "sports"]:
+        await show_job_or_sports_list(callback, products, category, subcategory, page=0)
+    else:
+        # Для товаров показываем с фото
+        await show_products_page(callback, user_id, page=0)
+    
     await callback.answer()
-
+    
+    
+    
 @router.callback_query(F.data.startswith("products_page_"))
 async def change_products_page(callback: CallbackQuery):
     """Смена страницы товаров"""
     user_id = callback.from_user.id
     page = int(callback.data.split("_")[2])
+    
+    if user_id in user_product_pages:
+        category = user_product_pages[user_id]["category"]
+        # Для категорий "job" и "sports" не поддерживаем пагинацию
+        if category in ["job", "sports"]:
+            await callback.answer("В этой категории одна страница")
+            return
+    
     await show_products_page(callback, user_id, page=page)
     await callback.answer()
+    
+    
+@router.callback_query(F.data.startswith("product_"))
+async def show_product_detail(callback: CallbackQuery):
+    """Показать детальную информацию о товаре/работе/спортике"""
+    product_id = int(callback.data.split("_")[1])
+    product = get_product_by_id(product_id)
+    
+    if not product:
+        await callback.answer("Позиция не найдена")
+        return
+    
+    # Получаем данные из хранилища пользователя
+    user_id = callback.from_user.id
+    if user_id in user_product_pages:
+        category = user_product_pages[user_id]["category"]
+        subcategory = user_product_pages[user_id]["subcategory"]
+    else:
+        category = product.category
+        subcategory = product.subcategory
+    
+    # Форматируем цену
+    price_text = f"{product.price:,} {product.currency}".replace(",", " ")
+    
+    # Формируем описание
+    description = f"""*{product.name}*\n\n{product.description}"""
+    
+    # Добавляем цену если не работа
+    if category != "job":
+        description += f"\n\n💰 *Цена:* {price_text}"
+    
+    # Для работ показываем только кнопку "Назад"
+    if category == "job":
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="◀️ Назад к подкатегориям",
+                        callback_data="back_to_subcategories"
+                    )
+                ]
+            ]
+        )
+        
+        # Удаляем старое сообщение и отправляем новое
+        await callback.message.delete()
+        await callback.message.answer(
+            description,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+    elif category == "sports":
+        # Для спортиков показываем кнопку покупки без фото
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=f"💰 Купить за {product.price} руб.",
+                        callback_data=f"buy_product_{product.id}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="◀️ Назад к подкатегориям",
+                        callback_data="back_to_subcategories"
+                    )
+                ]
+            ]
+        )
+        
+        await callback.message.delete()
+        await callback.message.answer(
+            description,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+    else:
+        # Для товаров марихуаны показываем фото и кнопку покупки
+        # Получаем фото товара
+        product_photo = get_product_photo_file(product.id, category, subcategory)
+        
+        # Отправляем фото товара с описанием
+        await callback.message.delete()
+        
+        await callback.message.answer_photo(
+            photo=product_photo,
+            caption=description,
+            reply_markup=get_product_detail_keyboard(product, category, subcategory),
+            parse_mode="Markdown"
+        )
+    
+    await callback.answer()
 
+@router.callback_query(F.data.startswith("buy_product_"))
+async def process_buy_product(callback: CallbackQuery):
+    """Обработка нажатия на кнопку покупки товара/спортика/пробива"""
+    try:
+        # Получаем ID товара из callback_data (формат: buy_product_1)
+        product_id = int(callback.data.split("_")[2])
+        product = get_product_by_id(product_id)
+        
+        if not product:
+            await callback.answer("Товар не найден!")
+            return
+        
+        # Проверяем категорию
+        if product.category == "job":
+            await callback.answer("Для работы нажмите кнопку 'Назад'")
+            return
+        
+        # Создаем платежную ссылку
+        payment_result = await crypto_pay.create_invoice(
+            amount=product.price,
+            currency="RUB"
+        )
+        
+        if not payment_result["success"]:
+            await callback.answer(f"Ошибка: {payment_result.get('error', 'Неизвестная ошибка')}")
+            return
+        
+        # Создаем клавиатуру
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        
+        payment_keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="💳 Оплатить сейчас",
+                        url=payment_result["pay_url"]
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="✅ Проверить оплату",
+                        callback_data=f"check_payment_{payment_result['invoice_id']}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="🔙 Назад к товару",
+                        callback_data=f"product_{product_id}"
+                    )
+                ]
+            ]
+        )
+        
+        # Формируем текст для замены
+        payment_text = (
+            f"💳 *Оплата услуги*\n\n"  # Изменено с "товара" на "услуги"
+            f"*Услуга:* {product.name}\n"
+            f"*Цена:* {product.price} руб.\n\n"
+            f"1. Нажмите кнопку '💳 Оплатить сейчас'\n"
+            f"2. Оплатите счет\n"
+            f"3. Вернитесь в бот и нажмите '✅ Проверить оплату'\n\n"
+            f"Если не умете пользоваться криптой, есть СБП @Api312'\n\n"
+            f"*После оплаты свяжитесь с оператором @Api3211*"  # Добавлена ссылка на оператора
+        )
+        
+        # Проверяем, является ли сообщение фото или текстом
+        if callback.message.photo:
+            # Если сообщение содержит фото - меняем подпись и клавиатуру
+            await callback.message.edit_caption(
+                caption=payment_text,
+                reply_markup=payment_keyboard,
+                parse_mode="Markdown"
+            )
+        else:
+            # Если сообщение текстовое - меняем текст и клавиатуру
+            await callback.message.edit_text(
+                payment_text,
+                reply_markup=payment_keyboard,
+                parse_mode="Markdown"
+            )
+        
+        await callback.answer()
+        
+    except Exception as e:
+        import logging
+        logging.error(f"Ошибка при покупке товара: {e}")
+        await callback.answer("Произошла ошибка. Попробуйте позже.")
+
+
+
+                                        
 @router.callback_query(F.data.startswith("product_"))
 async def show_product_detail(callback: CallbackQuery):
     """Показать детальную информацию о товаре с фото"""
@@ -326,14 +605,11 @@ async def check_payment_status(callback: CallbackQuery):
             # Платеж успешен
             await callback.message.answer(
                 "✅ *Оплата подтверждена!*\n\n"
-                "📞 *Свяжитесь с оператором для получения адреса:*\n"
-                "👤 @оператор_телеграм\n\n"
+                "📞 *Свяжитесь с оператором для получения услуги:*\n"  # Изменено с "адреса" на "услуги"
+                "👤 @Api3211\n\n"  # Изменен контакт оператора
                 "⏰ *Время работы:*\n"
                 "Круглосуточно\n\n"
-                "📍 *Как получить заказ:*\n"
-                "1. Напишите оператору\n"
-                "2. Назовите номер счета\n"
-                "3. Получите адрес самовывоза",
+                "*После связи с оператором вы получите все детали.*",  # Измененный текст
                 parse_mode="Markdown"
             )
         else:
@@ -356,9 +632,14 @@ async def back_to_products(callback: CallbackQuery):
         if user_id in user_product_pages:
             data = user_product_pages[user_id]
             page = data.get("page", 0)
-            await show_products_page(callback, user_id, page=page)
+            # Для категорий "job" и "sports" не используем show_products_page
+            if category in ["job", "sports"]:
+                products = data["products"]
+                await show_job_or_sports_list(callback, products, category, subcategory, page)
+            else:
+                await show_products_page(callback, user_id, page=page)
     await callback.answer()
-
+    
 @router.callback_query(F.data == "back_to_subcategories")
 async def back_to_subcategories(callback: CallbackQuery):
     """Возврат к подкатегориям - ОСОБЫЙ ОБРАБОТЧИК"""

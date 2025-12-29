@@ -62,21 +62,31 @@ def get_product_detail_keyboard(product, category, subcategory):
     """Клавиатура для детального просмотра товара"""
     from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
     
-    # Основная кнопка покупки
-    keyboard = [
-        [
-            InlineKeyboardButton(
-                text=f"💰 Купить за {product.price} руб.",
-                callback_data=f"buy_product_{product.id}"  # Изменено!
-            )
-        ],
-        [
-            InlineKeyboardButton(text="◀️ Назад", callback_data=f"back_to_products_{category}_{subcategory}"),
-            InlineKeyboardButton(text="🏠 Главное меню", callback_data="main_menu")
+    # Для работ не показываем кнопку покупки
+    if category == "job":
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    text="◀️ Назад к подкатегориям",
+                    callback_data="back_to_subcategories"
+                )
+            ]
         ]
-    ]
+    else:
+        # Основная кнопка покупки для товаров и спортиков
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    text=f"💰 Купить за {product.price} руб.",
+                    callback_data=f"buy_product_{product.id}"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="◀️ Назад к подкатегориям",
+                    callback_data="back_to_subcategories"
+                )
+            ]
+        ]
     
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
-    
-  #  builder.adjust(1)
-   # return builder.as_markup()

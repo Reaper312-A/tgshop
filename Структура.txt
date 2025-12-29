@@ -39,16 +39,17 @@ TGSHOP/
 │   ├── start.py                    # /start
 │   ├── city_metro.py               # Город/метро
 │   ├── main_menu.py                # Главное меню
+│   ├── payments.py
 │   └── products.py                 # Товары
 │
 ├── utils/
 │   ├── __init__.py
-│   └── photos.py                   # Работа с фото
-│
+│   ├── photos.py                   # Работа с фото
+│   ├── payments.py                 
+│   └── payments_fixed.py
 └── photos/                         # Папка с фото
     ├── categories/                 # Обзорные фото (12 штук)
     └── products/                   # Детальные фото (48 штук)
-
 
 
 
